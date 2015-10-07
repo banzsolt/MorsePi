@@ -1,7 +1,8 @@
 import RPi.GPIO as GPIO
 import time
+import multiprocessing
 
-the_pin = 7
+out_pins = [7, 11, 13, 15, 16, 18, 22, 29]
 speed = 0.1
 
 morse = {'a': '.-',
@@ -42,7 +43,7 @@ morse = {'a': '.-',
          '0': '-----'}
 
 
-def process(text):
+def process(text, to_pin):
     global speed
     for character in text:
         if character == ' ':
@@ -50,34 +51,51 @@ def process(text):
         else:
             for signal in morse[character.lower()]:
                 if signal == '.':
-                    short()
+                    short(to_pin)
                 else:
-                    long()
+                    long(to_pin)
                 time.sleep(speed)
 
 
 def setup():
-    global the_pin
+    global out_pins
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(the_pin, GPIO.OUT)
+    for pin in out_pins:
+        GPIO.setup(pin, GPIO.OUT)
 
 
-def long():
-    global the_pin, speed
-    GPIO.output(the_pin, GPIO.HIGH)
+def long(to_pin):
+    global speed
+    GPIO.output(to_pin, GPIO.HIGH)
     time.sleep(3 * speed)
-    GPIO.output(the_pin, GPIO.LOW)
+    GPIO.output(to_pin, GPIO.LOW)
 
 
-def short():
-    global the_pin, speed
-    GPIO.output(the_pin, GPIO.HIGH)
+def short(to_pin):
+    global speed
+    GPIO.output(to_pin, GPIO.HIGH)
     time.sleep(speed)
-    GPIO.output(the_pin, GPIO.LOW)
+    GPIO.output(to_pin, GPIO.LOW)
 
 if __name__ == '__main__':
+    global out_pins
     setup()
+    output = multiprocessing.Queue()
+    
     while 1:
-        process('SOS')
-        time.sleep(5)
+        processes = []
+        for pin in out_pins:
+            processes.append(multiprocessing.Process(target=process, args=('Zsolti', pin,)))
+        
+        i = 0
+        while (i < len(processes)):
+            processes[i].start()
+            i += 1
+        i = 0
+        while (i < len(processes)):
+            processes[i].join()
+            i += 1
+            
+        time.sleep(1.5)
+        
     GPIO.cleanup()
