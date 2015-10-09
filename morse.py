@@ -3,7 +3,7 @@ import time
 import multiprocessing
 
 parallel = False
-speed = 0.1
+speed = 0.2
 data = {'3': 'e',
         '5': '',
         '7': 'e',
@@ -108,14 +108,36 @@ if __name__ == '__main__':
     output = multiprocessing.Queue()
     
     while 1:
-        processes = []
-        for pin_no, text in data.iteritems():
-            processes.append(multiprocessing.Process(target=process, args=(text, int(pin_no),)))
-        
+        processes = [multiprocessing.Process(target=process, args=('e', 3,)),
+                     multiprocessing.Process(target=process, args=('e', 7,)),
+                     multiprocessing.Process(target=process, args=('e', 3,)),
+                     multiprocessing.Process(target=process, args=('e', 7,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 3,)),
+                     multiprocessing.Process(target=process, args=('e', 7,)),
+                     multiprocessing.Process(target=process, args=('e', 3,)),
+                     multiprocessing.Process(target=process, args=('e', 7,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 13,)),
+                     multiprocessing.Process(target=process, args=('e', 12,)),
+                     multiprocessing.Process(target=process, args=('e', 11,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 8,)),
+                     multiprocessing.Process(target=process, args=('e', 11,)),
+                     multiprocessing.Process(target=process, args=('e', 10,)),
+                     multiprocessing.Process(target=process, args=('e', 8,)),
+                     multiprocessing.Process(target=process, args=('e', 7,)),
+                     multiprocessing.Process(target=process, args=('e', 5,)),
+                     multiprocessing.Process(target=process, args=('e', 3,)),
+                     multiprocessing.Process(target=process, args=('e', 3,))]
+
         i = 0
         while i < len(processes):
             processes[i].start()
             i += 1
+            time.sleep(2 * speed)
         if parallel:
             i = 0
             while i < len(processes):
