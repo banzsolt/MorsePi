@@ -3,12 +3,13 @@ import time
 import multiprocessing
 
 parallel = False
+same_output = True
 speed = 0.1
-data = {'3': 'e',
+data = {'3': '',
         '5': '',
-        '7': 'e',
+        '7': '',
         '8': '',
-        '10': 't',
+        '10': '',
         '11': '',
         '12': '',
         '13': '',
@@ -103,14 +104,17 @@ def short(to_pin):
     GPIO.output(to_pin, GPIO.LOW)
 
 if __name__ == '__main__':
-    global data, parallel
+    global data, parallel, same_output
     setup()
     output = multiprocessing.Queue()
     
     while 1:
         processes = []
         for pin_no, text in data.iteritems():
-            processes.append(multiprocessing.Process(target=process, args=(text, int(pin_no),)))
+            output = text
+            if same_output:
+                output = data['3']
+            processes.append(multiprocessing.Process(target=process, args=(output, int(pin_no),)))
         
         i = 0
         while i < len(processes):
