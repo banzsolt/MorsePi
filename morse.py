@@ -2,33 +2,34 @@ import RPi.GPIO as GPIO
 import time
 import multiprocessing
 
+parallel = False
 speed = 0.1
-data = {'3': 'Zsolti',
-        '5': 'this is process which is longer',
-        '7': 'Zsolti',
-        '8': 'Zsolti',
-        '10': 'Zsolti',
-        '11': 'Zsolti',
-        '12': 'Zsolti',
-        '13': 'Zsolti',
-        '15': 'Zsolti',
-        '16': 'Zsolti',
-        '18': 'Zsolti',
-        '19': 'Zsolti',
-        '21': 'Zsolti',
-        '22': 'Zsolti',
-        '23': 'Zsolti',
-        '24': 'Zsolti',
-        '26': 'Zsolti',
-        '29': 'Zsolti',
-        '31': 'Zsolti',
-        '32': 'Zsolti',
-        '33': 'Zsolti',
-        '35': 'Zsolti',
-        '36': 'Zsolti',
-        '37': 'Zsolti',
-        '38': 'Zsolti',
-        '40': 'Zsolti'}
+data = {'3': 'e',
+        '5': '',
+        '7': 'e',
+        '8': '',
+        '10': 't',
+        '11': '',
+        '12': '',
+        '13': '',
+        '15': '',
+        '16': '',
+        '18': '',
+        '19': '',
+        '21': '',
+        '22': '',
+        '23': '',
+        '24': '',
+        '26': '',
+        '29': '',
+        '31': '',
+        '32': '',
+        '33': '',
+        '35': '',
+        '36': '',
+        '37': '',
+        '38': '',
+        '40': ''}
 morse = {'a': '.-',
          'b': '-...',
          'c': '-.-.',
@@ -102,7 +103,7 @@ def short(to_pin):
     GPIO.output(to_pin, GPIO.LOW)
 
 if __name__ == '__main__':
-    global data
+    global data, parallel
     setup()
     output = multiprocessing.Queue()
     
@@ -115,10 +116,11 @@ if __name__ == '__main__':
         while i < len(processes):
             processes[i].start()
             i += 1
-        i = 0
-        while i < len(processes):
-            processes[i].join()
-            i += 1
+        if parallel:
+            i = 0
+            while i < len(processes):
+                processes[i].join()
+                i += 1
             
         time.sleep(1.5)
         
