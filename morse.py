@@ -1,11 +1,13 @@
 import RPi.GPIO as GPIO
 import time
 import multiprocessing
+import sys
 
-parallel = False
+args = sys.argv
+parallel = True
 same_output = True
 speed = 0.1
-data = {'3': '',
+data = {'3': 'SOS',
         '5': '',
         '7': '',
         '8': '',
@@ -103,11 +105,11 @@ def short(to_pin):
     time.sleep(speed)
     GPIO.output(to_pin, GPIO.LOW)
 
+
 if __name__ == '__main__':
-    global data, parallel, same_output
+    global data, parallel, same_output, args
     setup()
-    output = multiprocessing.Queue()
-    
+
     while 1:
         processes = []
         for pin_no, text in data.iteritems():
@@ -115,17 +117,18 @@ if __name__ == '__main__':
             if same_output:
                 output = data['3']
             processes.append(multiprocessing.Process(target=process, args=(output, int(pin_no),)))
-        
         i = 0
         while i < len(processes):
             processes[i].start()
+            if not parallel:
+                processes[i].join()
             i += 1
         if parallel:
             i = 0
             while i < len(processes):
                 processes[i].join()
                 i += 1
-            
+
         time.sleep(1.5)
-        
+
     GPIO.cleanup()
