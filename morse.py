@@ -30,9 +30,9 @@ data = {'3': 'SOS',
         '33': '',
         '35': '',
         '36': '',
-        '37': '',
-        '38': '',
-        '40': ''}
+        '37': ''}#,
+        #'38': '',
+        #'40': ''}
 morse = {'a': '.-',
          'b': '-...',
          'c': '-.-.',
@@ -109,26 +109,33 @@ def short(to_pin):
 if __name__ == '__main__':
     global data, parallel, same_output, args
     setup()
+    GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     while 1:
-        processes = []
-        for pin_no, text in data.iteritems():
-            output = text
-            if same_output:
-                output = data['3']
-            processes.append(multiprocessing.Process(target=process, args=(output, int(pin_no),)))
-        i = 0
-        while i < len(processes):
-            processes[i].start()
-            if not parallel:
-                processes[i].join()
-            i += 1
-        if parallel:
+        button_input_state = GPIO.input(40)
+        sound_input_state = GPIO.input(38)
+        if button_input_state == False or sound_input_state == False:
+            print('Leds on')
+            processes = []
+            for pin_no, text in data.iteritems():
+                output = text
+                if same_output:
+                    output = data['3']
+                processes.append(multiprocessing.Process(target=process, args=(output, int(pin_no),)))
             i = 0
             while i < len(processes):
-                processes[i].join()
+                processes[i].start()
+                if not parallel:
+                    processes[i].join()
                 i += 1
-
-        time.sleep(1.5)
+            if parallel:
+                i = 0
+                while i < len(processes):
+                    processes[i].join()
+                    i += 1
+    
+            time.sleep(1.5)
+        time.sleep(0.5)    
 
     GPIO.cleanup()
