@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import multiprocessing
 import sys
+import json
 
 args = sys.argv
 parallel = True
@@ -71,6 +72,23 @@ morse = {'a': '.-',
          '0': '-----'}
 
 
+def process_arguments():
+    global args
+    if len(args) == 0:
+        return
+    information = json.loads('{}')
+    print(information)
+    last_option = None
+    for argument in args:
+        if '-' in argument:
+            information[str(argument)[1]] = []
+            last_option = str(argument)[1]
+        else:
+            if last_option is not None:
+                information[last_option].append(argument)
+    
+    return  information
+
 def process(the_text, to_pin):
     global speed
     for character in the_text:
@@ -83,7 +101,6 @@ def process(the_text, to_pin):
                 else:
                     long(to_pin)
                 time.sleep(speed)
-
 
 def setup():
     global data
@@ -109,6 +126,12 @@ def short(to_pin):
 if __name__ == '__main__':
     global data, parallel, same_output, args
     setup()
+    test = json.loads(process_arguments())
+    print(test)
+    result = False
+    if test['s'] is not None:
+        result = True
+    print(result)
 
     while 1:
         processes = []
@@ -128,6 +151,7 @@ if __name__ == '__main__':
             while i < len(processes):
                 processes[i].join()
                 i += 1
+
 
         time.sleep(1.5)
 
